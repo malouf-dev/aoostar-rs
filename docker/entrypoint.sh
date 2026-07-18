@@ -10,7 +10,7 @@ if [ $# -gt 0 ]; then
     exec /app/asterctl "$@"
 fi
 
-: "${ASTERCTL_DEVICE:=/dev/ttyUSB0}"
+: "${ASTERCTL_DEVICE:=/dev/ttyACM0}"
 : "${ASTERCTL_CONFIG:=monitor.json}"
 : "${ASTERCTL_SIMULATE:=0}"
 : "${NET_INTERFACE:=}"

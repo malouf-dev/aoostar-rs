@@ -19,7 +19,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     environment:
       # LCD serial port; check `ls /dev/serial/by-id/` on the host.
-      ASTERCTL_DEVICE: /dev/ttyUSB0
+      ASTERCTL_DEVICE: /dev/ttyACM0
       # Network interface for the panel network sensors.
       # Auto-detected from the default route if unset.
       # NET_INTERFACE: enp2s0

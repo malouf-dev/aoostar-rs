@@ -34,7 +34,7 @@ docker compose down
 
 ## Finding the LCD serial port
 
-The default device is `/dev/ttyUSB0`. If that is not the right port, find it with:
+The default device is `/dev/ttyACM0`. If that is not the right port, find it with:
 
 ```shell
 ls -l /dev/serial/by-id/
@@ -49,7 +49,7 @@ All settings are environment variables in `docker-compose.yml`:
 
 | Variable | Default | Description |
 |---|---|---|
-| `ASTERCTL_DEVICE` | `/dev/ttyUSB0` | LCD serial port |
+| `ASTERCTL_DEVICE` | `/dev/ttyACM0` | LCD serial port |
 | `ASTERCTL_CONFIG` | `monitor.json` | Panel configuration file (in `/app/cfg`) |
 | `NET_INTERFACE` | auto | Interface for the network panel sensors. Auto-detected from the default route if unset. |
 | `SENSOR_REFRESH` | `3` | Sensor refresh interval in seconds |
@@ -90,7 +90,7 @@ device grants:
       - SYS_RAWIO        # smartctl SMART commands
       - SYS_ADMIN        # smartctl on NVMe
     devices:
-      - /dev/ttyUSB0     # the LCD
+      - /dev/ttyACM0     # the LCD
       - /dev/nvme0       # repeat for each drive smartctl should read
       - /dev/sda
 ```

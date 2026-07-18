@@ -141,7 +141,7 @@ checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
 name = "aster-sysinfo"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "clap",
  "env_logger",
@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "asterctl"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "ab_glyph",
  "anyhow",
@@ -176,7 +176,7 @@ dependencies = [
 
 [[package]]
 name = "asterctl-lcd"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "bytes",

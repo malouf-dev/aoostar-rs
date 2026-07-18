@@ -1,5 +1,17 @@
 # Linux systemd Services
 
+> ⚠️ Do **not** combine these services with the [Docker setup](../docker.md):
+> they fight over the same serial port, and `lcd-off.service` will switch the
+> screen off at boot while the container is trying to drive it.
+> Pick one approach. If you switch to Docker, remove the services first:
+>
+> ```shell
+> sudo systemctl disable --now lcd-off.service aster-sysinfo.service
+> sudo rm -f /etc/systemd/system/lcd-off.service /etc/systemd/system/aster-sysinfo.service
+> sudo systemctl daemon-reload
+> sudo rm -f /usr/local/bin/asterctl /usr/local/bin/aster-sysinfo
+> ```
+
 ## Switch Off LCD on Boot
 
 The systemd unit [lcd-off.service](https://github.com/malouf-dev/aoostar-rs/blob/main/linux/lcd-off.service)

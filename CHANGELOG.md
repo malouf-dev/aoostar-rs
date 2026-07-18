@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Changes in the next release_
 
+## v0.3.0 - 2026-07-18
+
+First release of this independent continuation of [zehnm/aoostar-rs](https://github.com/zehnm/aoostar-rs).
+
 ### Added
 - Docker support: multi-stage Dockerfile, entrypoint running `aster-sysinfo` + `asterctl` together,
   `docker-compose.yml` with host data access, and a Docker sensor mapping with network interface auto-detection.

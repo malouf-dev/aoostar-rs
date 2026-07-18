@@ -10,7 +10,31 @@ It has only been tested on the WTR MAX, but should also support the GEM12+ PRO d
 > all credit for the foundations goes there. This fork adds Docker support and
 > continues maintenance.
 
-Check out the **[User Guide](https://malouf-dev.github.io/aoostar-rs)** for a list of features and installation and usage information.
+Check out the **[User Guide](docs/SUMMARY.md)** for a list of features and installation and usage information.
+
+## Getting started
+
+On the machine the screen is plugged into (tested on Ubuntu Server 24.04 with Docker Engine):
+
+```shell
+git clone https://github.com/malouf-dev/aoostar-rs.git
+cd aoostar-rs
+docker compose up -d --build
+```
+
+The first build takes a few minutes, then the LCD starts cycling the stock
+AOOSTAR panels with live system data. Useful commands:
+
+```shell
+docker compose logs -f                  # watch it run
+docker compose down                     # stop (switches the LCD off)
+docker compose run --rm asterctl --off  # one-off: just switch the LCD off
+```
+
+If the screen doesn't respond, find the right serial port with
+`ls -l /dev/serial/by-id/` and set `ASTERCTL_DEVICE` in `docker-compose.yml`.
+Full details and configuration options: [Docker guide](docs/docker.md).
+Prefer running without Docker? See [Installation](docs/installation.md).
 
 ## Features
 
@@ -43,7 +67,7 @@ Note: Multiple attempts to contact the manufacturer for documentation have recei
 
 With that out of the way, on to the fun stuff!
 
-- Browse the source code or read the [User Guide](https://malouf-dev.github.io/aoostar-rs)
+- Browse the source code or read the [User Guide](docs/SUMMARY.md)
 - Run it with [Docker](docs/docker.md) (recommended), or see [releases](https://github.com/malouf-dev/aoostar-rs/releases) for binary Linux x64 releases.
 
 ## Contributing

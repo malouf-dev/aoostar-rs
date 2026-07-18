@@ -4,9 +4,14 @@ There are multiple ways to install the `asterctl` CLI tool. Choose any one of th
 
 Please note that only Linux has been tested so far.
 
+## Docker (recommended)
+
+Run everything in one container with live host sensor data — no Rust toolchain
+required on the host. See the [Docker](docker.md) chapter.
+
 ## Pre-compiled binaries
 
-Executable binaries are available for download on the [GitHub Releases page](https://github.com/zehnm/aoostar-rs/releases).
+Executable binaries are available for download on the [GitHub Releases page](https://github.com/malouf-dev/aoostar-rs/releases).
 Download the binary for your platform (only Linux available at the moment) and extract the archive.
 The archive contains the `asterctl` and `aster-sysinfo` executables which you can run.
 
@@ -30,7 +35,7 @@ sudo apt install build-essential git pkg-config libudev-dev
 2. Checkout project:
 
 ```shell
-git clone https://github.com/zehnm/aoostar-rs.git
+git clone https://github.com/malouf-dev/aoostar-rs.git
 cd aoostar-rs
 ```
 

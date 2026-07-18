@@ -5,6 +5,7 @@
 # User guide
 
 - [Installation](installation.md)
+  - [Docker](docker.md)
   - [Linux systemd Service](linux/README.md)
 - [asterctl Tool](asterctl.md)
 - [Shell Commands](shell_commands.md)

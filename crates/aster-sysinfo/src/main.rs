@@ -93,7 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let upd_start_time = Instant::now();
 
         sysinfo_source.refresh();
-        sysinfo_source.update_sensors(&mut sensors)?;
+        sysinfo_source.update_sensors(&mut sensors, !disk_refresh.is_zero())?;
 
         if !disk_refresh.is_zero() && disk_refresh_time.elapsed() > disk_refresh {
             debug!("Refreshing individual disks");
@@ -209,6 +209,7 @@ impl SysinfoSource {
     fn update_sensors(
         &self,
         sensors: &mut HashMap<String, String>,
+        skip_storage_usage: bool,
     ) -> Result<(), Box<dyn std::error::Error>> {
         debug!("Refreshing sensors");
         for cpu in self.sys.cpus() {
@@ -337,12 +338,16 @@ impl SysinfoSource {
                 }
                 _ => continue,
             }
-            // special label for AOOSTAR-X system panel
-            add_sensor(
-                sensors,
-                format!("{label}_usage_percent"),
-                (disk.total_space() - disk.available_space()) * 100 / disk.total_space(),
-            );
+            // special label for AOOSTAR-X system panel.
+            // Skipped if the individual disk refresh logic is enabled, which writes the same
+            // labels: the disk ordering of the two sources can differ and values would flap.
+            if !skip_storage_usage {
+                add_sensor(
+                    sensors,
+                    format!("{label}_usage_percent"),
+                    (disk.total_space() - disk.available_space()) * 100 / disk.total_space(),
+                );
+            }
 
             // using similar labels as AOOSTAR-X, but combining `{label2}_{label}`
             let device = disk.name().to_string_lossy().replace(' ', "_");
@@ -405,6 +410,9 @@ impl SysinfoSource {
                 add_sensor(sensors, label, format!("{temperature:.1}"));
             }
         }
+
+        #[cfg(target_os = "linux")]
+        update_gpu_usage(sensors);
 
         // Network interfaces name, total data received and total data transmitted:
         for (interface_name, data) in &self.networks {
@@ -479,6 +487,34 @@ fn add_sensor(
     value: impl Display,
 ) {
     sensors.insert(label.into(), value.to_string());
+}
+
+/// GPU utilization from the drm sysfs interface (amdgpu: `gpu_busy_percent`).
+#[cfg(target_os = "linux")]
+fn update_gpu_usage(sensors: &mut HashMap<String, String>) {
+    let Ok(entries) = fs::read_dir("/sys/class/drm") else {
+        return;
+    };
+
+    let mut cards: Vec<PathBuf> = entries
+        .flatten()
+        .filter(|e| {
+            let name = e.file_name();
+            let name = name.to_string_lossy();
+            // only plain card devices (card0, card1, ...), not connectors like card0-HDMI-A-1
+            name.strip_prefix("card")
+                .is_some_and(|n| n.parse::<u32>().is_ok())
+        })
+        .map(|e| e.path())
+        .collect();
+    cards.sort();
+
+    for card in cards {
+        if let Ok(value) = fs::read_to_string(card.join("device/gpu_busy_percent")) {
+            add_sensor(sensors, "gpu_usage_percent", value.trim());
+            return;
+        }
+    }
 }
 
 fn update_linux_storage_sensors(
@@ -692,13 +728,18 @@ pub fn get_smartctl_disk_temperature(dev: &str) -> Result<Option<i32>, Box<dyn s
     let nvme_temp_regex = Regex::new(r"Temperature:\s+(\d+)\s")?;
 
     let dev = format!("/dev/{}", dev);
-    match Command::new("sudo")
-        .arg("-n")
-        .arg("smartctl")
-        .arg("-A")
-        .arg(&dev)
-        .output()
-    {
+    // running as root (e.g. in a container): no sudo required, and it may not be installed
+    let output = if is_root() {
+        Command::new("smartctl").arg("-A").arg(&dev).output()
+    } else {
+        Command::new("sudo")
+            .arg("-n")
+            .arg("smartctl")
+            .arg("-A")
+            .arg(&dev)
+            .output()
+    };
+    match output {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(&output.stdout);
 
@@ -717,6 +758,15 @@ pub fn get_smartctl_disk_temperature(dev: &str) -> Result<Option<i32>, Box<dyn s
     }
 
     Ok(None)
+}
+
+/// Effective root check without libc: /proc/self is owned by the process euid.
+/// Returns false on systems without procfs (e.g. macOS), falling back to sudo.
+fn is_root() -> bool {
+    use std::os::unix::fs::MetadataExt;
+    fs::metadata("/proc/self")
+        .map(|m| m.uid() == 0)
+        .unwrap_or(false)
 }
 
 /// Calculate actual filesystem usage rate of hard disk (based on df command)

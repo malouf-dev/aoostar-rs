@@ -29,6 +29,8 @@ COPY cfg /app/cfg
 COPY fonts /app/fonts
 COPY docker/sensor-mapping/docker.tmpl /app/cfg/sensor-mapping/docker.tmpl
 COPY docker/sensor-mapping/docker-filter.cfg /app/cfg/sensor-mapping/docker-filter.cfg
-COPY --chmod=755 docker/entrypoint.sh /app/entrypoint.sh
+COPY docker/entrypoint.sh /app/entrypoint.sh
+# explicit chmod: COPY --chmod is silently ignored by some builders
+RUN chmod 755 /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]

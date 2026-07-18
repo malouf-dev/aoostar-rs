@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Changes in the next release_
 
+### Added
+- Docker support: multi-stage Dockerfile, entrypoint running `aster-sysinfo` + `asterctl` together,
+  `docker-compose.yml` with host data access, and a Docker sensor mapping with network interface auto-detection.
+- aster-sysinfo: `gpu_usage_percent` sensor from the drm sysfs interface (amdgpu `gpu_busy_percent`).
+
+### Fixed
+- aster-sysinfo: run smartctl directly without sudo when running as root (container use case).
+- aster-sysinfo: `storage_ssd/hdd[x]_usage_percent` no longer flaps between two different data
+  sources when the individual disk refresh logic is enabled.
+
 ## v0.2.0 - 2025-08-31
 ### Fixed
 - Misplaced text sensors in custom panels ([#11](https://github.com/zehnm/aoostar-rs/issues/11)).

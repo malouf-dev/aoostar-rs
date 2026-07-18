@@ -1,0 +1,33 @@
+services:
+  asterctl:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: asterctl:latest
+    container_name: asterctl
+    restart: unless-stopped
+    init: true
+    # host network: real interface names, speeds and IP addresses
+    network_mode: host
+    # privileged: access to the LCD serial port, /dev disks for smartctl
+    # and the full /sys tree. See docker/README.md for a locked-down variant.
+    privileged: true
+    volumes:
+      # host filesystems (read-only) for accurate disk usage values
+      - /:/host:ro,rslave
+      # host timezone for the date/time panel sensors
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      # LCD serial port; check `ls /dev/serial/by-id/` on the host.
+      ASTERCTL_DEVICE: /dev/ttyUSB0
+      # Network interface for the panel network sensors.
+      # Auto-detected from the default route if unset.
+      # NET_INTERFACE: enp2s0
+      # Sensor refresh interval in seconds
+      SENSOR_REFRESH: "3"
+      # Individual disk (usage + temperature) refresh interval in seconds, 0 = off
+      DISK_REFRESH: "60"
+      # Use smartctl for drive temperatures (needs privileged mode)
+      SMARTCTL: "1"
+      # Switch the LCD off when the container stops
+      LCD_OFF_ON_STOP: "1"
